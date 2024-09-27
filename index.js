@@ -34,8 +34,8 @@ app.post('/api/drivers/location', async (req, res) => {
 });
 
 
-app.get('/api/drivers/search', async (req, res) => {
-    const { latitude, longitude, radius } = req.query;
+app.post('/api/drivers/search', async (req, res) => {
+    const { latitude, longitude, radius } = req.body;
 
     console.log(latitude, longitude, radius);
 
@@ -52,7 +52,13 @@ app.get('/api/drivers/search', async (req, res) => {
             }
         });
         
-        res.json(drivers);
+        const response = drivers.map(driver => ({
+            driverId: driver._id, // Assuming _id is the driver ID
+            latitude: driver.location.coordinates[1], // latitude
+            longitude: driver.location.coordinates[0] // longitude
+        }));
+
+        res.json(response);
         
     } catch (err) {
         console.error(err);
@@ -69,7 +75,7 @@ app.get('/', (req, res) => {
     );
 });
 
-mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost:27017/qg-taxi-locator-prod', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
     })

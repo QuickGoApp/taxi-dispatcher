@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const driverSchema = new mongoose.Schema({
+  _id: { type: String },
   location: {
     type: { type: String, default: 'Point' },
     coordinates: [Number] // [longitude, latitude]
