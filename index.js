@@ -27,6 +27,7 @@ app.post('/api/drivers/location', async (req, res) => {
         const driver = await Driver.findOneAndUpdate(
             { _id: driverId },
             {
+                type: type,
                 location: { type: 'Point', coordinates: [longitude, latitude] },
                 timestamp: Date.now()
             },
