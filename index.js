@@ -2,11 +2,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const geolib = require('geolib');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
+
+// Enable CORS for all routes
+app.use(cors({
+    origin: 'http://localhost:4200',  // Allow requests from your Angular frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Specify allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization']  // Specify allowed headers
+}));
 
 const Driver = require('./models/driver.model');
 
@@ -52,13 +60,15 @@ app.post('/api/drivers/search', async (req, res) => {
             }
         });
         
-        const response = drivers.map(driver => ({
+        const response = drivers.map(driver => (
+            {
             driverId: driver._id, // Assuming _id is the driver ID
             latitude: driver.location.coordinates[1], // latitude
             longitude: driver.location.coordinates[0] // longitude
         }));
 
-        res.json(response);
+        const responseMessage={"statusCode":200,"message":"success","data":response}
+        res.json(responseMessage);
         
     } catch (err) {
         console.error(err);
