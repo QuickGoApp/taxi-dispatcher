@@ -2,11 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const geolib = require('geolib');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
+
+app.use(cors({
+    origin: 'http://localhost:4200',  
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  
+    allowedHeaders: ['Content-Type', 'Authorization']  
+}));
 
 const Driver = require('./models/driver.model');
 
@@ -38,7 +45,7 @@ app.post('/api/drivers/search', async (req, res) => {
     const { latitude, longitude, type, radius } = req.body;
     try {
         const center = { type: 'Point', coordinates: [longitude, latitude] };
-        const distanceInMeters = radius * 1000; // Convert radius to meters
+        const distanceInMeters = radius * 1000;
 
         const drivers = await Driver.find({
             type: type,
@@ -49,15 +56,17 @@ app.post('/api/drivers/search', async (req, res) => {
                 }
             }
         });
-
-        const response = drivers.map(driver => ({
+        
+        const response = drivers.map(driver => (
+            {
             driverId: driver._id, 
-            latitude: driver.location.coordinates[1], 
-            longitude: driver.location.coordinates[0] 
+            latitude: driver.location.coordinates[1],
+            longitude: driver.location.coordinates[0]
         }));
 
-        res.json(response);
-
+        const responseMessage={"statusCode":200,"message":"success","data":response}
+        res.json(responseMessage);
+        
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error searching for drivers' });
